@@ -6,50 +6,138 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
-
+    @StateObject private var viewModel = MoviesViewModel()
+    
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+        TabView {
+            
+            // MARK: - Filmler Sekmesi
+            VStack {
+                Button("Filmleri Getir") {
+                    viewModel.loadMovies()
+                }
+                .padding()
+                
+                List(viewModel.movies) { movie in
+                    HStack(spacing: 12) {
+                        // Film posteri
+                        if let imageName = movie.image,
+                           let url = viewModel.imageURL(for: imageName) {
+                            
+                            AsyncImage(url: url) { phase in
+                                switch phase {
+                                case .empty:
+                                    ProgressView()
+                                        .frame(width: 60, height: 90)
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 60, height: 90)
+                                        .clipped()
+                                        .cornerRadius(8)
+                                case .failure:
+                                    Image(systemName: "photo")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 60, height: 90)
+                                        .foregroundColor(.gray)
+                                @unknown default:
+                                    EmptyView()
+                                }
+                            }
+                        }
+                        
+                        // Film bilgileri + Sepete ekle butonu
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(movie.name ?? "İsimsiz")
+                                .font(.headline)
+                            Text("\(movie.year ?? 0)")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            
+                            Button {
+                                viewModel.addToCart(movie: movie)
+                            } label: {
+                                Label("Sepete Ekle", systemImage: "cart.badge.plus")
+                                    .font(.subheadline)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.blue)
+                            .padding(.top, 4)
+                        }
                     }
+                    .padding(.vertical, 4)
                 }
-                .onDelete(perform: deleteItems)
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
+            .tabItem {
+                Label("Filmler", systemImage: "film")
+            }
+            
+            // MARK: - Sepet Sekmesi
+            VStack {
+                Button("Sepeti Getir") {
+                    viewModel.loadCartMovies()
                 }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                .padding()
+                
+                List(viewModel.cartMovies) { cartMovie in
+                    HStack(spacing: 12) {
+                        if let url = viewModel.imageURL(for: cartMovie.image) {
+                            AsyncImage(url: url) { phase in
+                                switch phase {
+                                case .empty:
+                                    ProgressView()
+                                        .frame(width: 50, height: 75)
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 50, height: 75)
+                                        .clipped()
+                                        .cornerRadius(6)
+                                case .failure:
+                                    Image(systemName: "photo")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 50, height: 75)
+                                        .foregroundColor(.gray)
+                                @unknown default:
+                                    EmptyView()
+                                }
+                            }
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(cartMovie.name)
+                                .font(.headline)
+                            Text("Adet: \(cartMovie.orderAmount)")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        Text("\(cartMovie.price) ₺")
+                            .font(.headline)
+                            .foregroundColor(.green)
+                        
+                        // MARK: - Sil Butonu
+                        Button {
+                            viewModel.deleteFromCart(cartMovie: cartMovie)
+                        } label: {
+                            Image(systemName: "trash")
+                                .foregroundColor(.red)
+                        }
+                        .buttonStyle(.borderless) // Liste içinde butonun düzgün çalışması için
                     }
+                    .padding(.vertical, 4)
                 }
             }
-        } detail: {
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+            .tabItem {
+                Label("Sepet", systemImage: "cart")
             }
         }
     }
@@ -57,5 +145,4 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }

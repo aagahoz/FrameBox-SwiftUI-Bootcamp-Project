@@ -6,27 +6,20 @@
 //
 
 import SwiftUI
-import SwiftData
 
 @main
 struct FrameBoxApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
-
+    
+    init() {
+        let appearance = UISegmentedControl.appearance()
+        appearance.selectedSegmentTintColor = UIColor(AppColors.accent)
+        appearance.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
+        appearance.setTitleTextAttributes([.foregroundColor: UIColor.lightGray], for: .normal)
+    }
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TabBarRootView()
         }
-        .modelContainer(sharedModelContainer)
     }
 }

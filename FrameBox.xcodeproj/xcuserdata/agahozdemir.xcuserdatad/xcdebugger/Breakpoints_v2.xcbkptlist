@@ -3,4 +3,52 @@
    uuid = "454EBF52-1E6F-4256-94DE-12574B696440"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4A23C550-A091-40C6-BFE2-D0BC4CB22DD2"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FrameBox/MoviesViewModel.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "24"
+            endingLineNumber = "24"
+            landmarkName = "unknown"
+            landmarkType = "0">
+            <Locations>
+               <Location
+                  uuid = "4A23C550-A091-40C6-BFE2-D0BC4CB22DD2 - 63dee446c2bf91fe"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Result&lt;Swift.Array&lt;FrameBox.MovieModel&gt;, Swift.Error&gt;) -&gt; () in FrameBox.MoviesViewModel.loadMovies() -&gt; ()"
+                  moduleName = "FrameBox.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/agahozdemir/Documents/Programming/GitHub/FrameBox/FrameBox/MoviesViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "24"
+                  endingLineNumber = "24">
+               </Location>
+               <Location
+                  uuid = "4A23C550-A091-40C6-BFE2-D0BC4CB22DD2 - e3033298af96fc7d"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 @Swift.MainActor () -&gt; () in closure #1 (Swift.Result&lt;Swift.Array&lt;FrameBox.MovieModel&gt;, Swift.Error&gt;) -&gt; () in FrameBox.MoviesViewModel.loadMovies() -&gt; ()"
+                  moduleName = "FrameBox.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/agahozdemir/Documents/Programming/GitHub/FrameBox/FrameBox/MoviesViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "23"
+                  endingLineNumber = "23">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

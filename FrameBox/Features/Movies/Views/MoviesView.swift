@@ -73,7 +73,26 @@ struct MoviesView: View {
                 }
             }
             .navigationTitle("FrameBox")
+            // MoviesView içindeki navigationTitle kısmını şu şekilde güncelle:
+
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("FrameBox")
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundColor(AppColors.textPrimary)
+                        .shadow(color: AppColors.accent.opacity(0.6), radius: 2, x: 0, y: 1)
+                }
+            }
+            .background(
+                // Üst kısım için hafif blur/gradient
+                LinearGradient(
+                    colors: [AppColors.background.opacity(0.9), AppColors.background.opacity(0.0)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea(edges: .top)
+            )
         }
     }
 }
@@ -154,6 +173,7 @@ struct SearchResultRow: View {
     var body: some View {
         NavigationLink(destination: AddMovieToCartView(movie: movie)) {
             HStack(spacing: 12) {
+                // Poster
                 if let url = imageURL {
                     AsyncImage(url: url) { phase in
                         switch phase {
@@ -183,89 +203,180 @@ struct SearchResultRow: View {
                         .cornerRadius(8)
                 }
                 
+                // Bilgi Alanı
                 VStack(alignment: .leading, spacing: 6) {
+                    // 1. satır → İsim
                     Text(movie.name ?? "İsimsiz")
                         .font(.headline)
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                    
+                    // 2. satır → Kategori
+                    if let category = movie.category {
+                        Text(category)
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
+                    
+                    // 3. satır → Yıl
                     Text("\(movie.year ?? 0)")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.gray)
+                    
+                    // 4. satır → Rating + Price
+                    HStack(spacing: 8) {
+                        if let rating = movie.rating {
+                            HStack(spacing: 2) {
+                                Image(systemName: "star.fill")
+                                    .foregroundColor(.yellow)
+                                    .font(.subheadline)
+                                Text(String(format: "%.1f", rating))
+                                    .foregroundColor(.white)
+                                    .font(.subheadline)
+                            }
+                        }
+                        
+                        if let price = movie.price {
+                            Text("$\(price)")
+                                .bold()
+                                .foregroundColor(AppColors.accent)
+                                .font(.subheadline)
+                        }
+                    }
                 }
                 
                 Spacer()
             }
             .frame(maxWidth: .infinity)
             .padding()
-            .background(Color(.systemGray6).opacity(0.5))
-            .cornerRadius(12)
+            .background(AppColors.cardBackground)
+            .cornerRadius(16)
+            .shadow(color: .black.opacity(0.6), radius: 8, x: 0, y: 4)
         }
-        .buttonStyle(PlainButtonStyle()) // default link stilini kaldırır
+        .buttonStyle(PlainButtonStyle())
     }
 }
+
 // MARK: - Page View İçin Kart
 struct MovieCardView: View {
     let movie: MovieModel
     let imageURL: URL?
     
     var body: some View {
-        
         NavigationLink(destination: AddMovieToCartView(movie: movie)) {
-            
             GeometryReader { geo in
-                let cardWidth = geo.size.width * 0.85
-                let cardHeight = geo.size.height * 0.75
+                let cardWidth = geo.size.width * 0.70
                 
                 ZStack(alignment: .bottomLeading) {
+                    // Poster
                     if let url = imageURL {
                         AsyncImage(url: url) { phase in
                             switch phase {
                             case .empty:
                                 Color.gray.opacity(0.3)
+                                    .frame(width: cardWidth)
+                                    .aspectRatio(2/3, contentMode: .fit) // 📌 Oranı koru
                             case .success(let image):
                                 image.resizable()
-                                    .scaledToFill()
-                                    .frame(width: cardWidth, height: cardHeight)
+                                    .aspectRatio(2/3, contentMode: .fit) // 📌 Poster oranı
+                                    .frame(width: cardWidth)
                                     .clipped()
                             case .failure:
                                 Color.gray.opacity(0.3)
-                                    .frame(width: cardWidth, height: cardHeight)
+                                    .frame(width: cardWidth)
+                                    .aspectRatio(2/3, contentMode: .fit)
                             @unknown default:
                                 Color.gray.opacity(0.3)
-                                    .frame(width: cardWidth, height: cardHeight)
+                                    .frame(width: cardWidth)
+                                    .aspectRatio(2/3, contentMode: .fit)
                             }
                         }
                     } else {
                         Color.gray.opacity(0.3)
-                            .frame(width: cardWidth, height: cardHeight)
+                            .frame(width: cardWidth)
+                            .aspectRatio(2/3, contentMode: .fit)
                     }
                     
-                    VStack(alignment: .leading, spacing: 8) {
+                    // Gradient + Metinler
+                    VStack(alignment: .leading, spacing: 6) {
+                        // Film adı
                         Text(movie.name ?? "İsimsiz")
-                            .font(.largeTitle)
+                            .font(.title3)
                             .bold()
                             .foregroundColor(.white)
+                            .lineLimit(2)
                         
-                        Text("\(movie.year ?? 0)")
-                            .font(.title2)
-                            .foregroundColor(.white.opacity(0.8))
+                        // Alt bilgiler → eşit boşluk
+                        HStack {
+                            Text("\(movie.year ?? 0)")
+                            Spacer()
+                            if let category = movie.category {
+                                Text(category)
+                            }
+                            Spacer()
+                            if let price = movie.price {
+                                Text("$\(price)")
+                                    .bold()
+                                    .foregroundColor(AppColors.accent)
+                            }
+                            Spacer()
+                            if let rating = movie.rating {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "star.fill")
+                                        .foregroundColor(.yellow)
+                                    Text(String(format: "%.1f", rating))
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        }
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.85))
                     }
                     .padding()
-                    .frame(width: cardWidth)
+                    .frame(width: cardWidth, alignment: .leading)
                     .background(
                         LinearGradient(
-                            colors: [.black.opacity(0.7), .clear],
+                            colors: [
+                                Color.black.opacity(0.95),
+                                Color.black.opacity(0.7),
+                                Color.clear
+                            ],
                             startPoint: .bottom,
                             endPoint: .top
                         )
                     )
+                    .cornerRadius(16, corners: [.bottomLeft, .bottomRight])
                 }
-                .frame(width: cardWidth, height: cardHeight)
+                .frame(width: cardWidth)
+                .aspectRatio(2/3, contentMode: .fit) // 📌 Kartın tamamı poster oranında
                 .cornerRadius(16)
-                .shadow(color: AppColors.accent.opacity(0.6), radius: 30, x: 0, y: 0) // dışarıya yayılma
-                .shadow(color: .black.opacity(0.8), radius: 20, x: 0, y: 10) // sinematik derinlik
+                .shadow(color: AppColors.accent.opacity(0.6), radius: 30, x: 0, y: 0)
+                .shadow(color: .black.opacity(0.8), radius: 20, x: 0, y: 10)
                 .position(x: geo.size.width / 2, y: geo.size.height / 2)
             }
         }
         .padding(.vertical, 12)
+    }
+}
+
+// CornerRadius sadece alt köşeler için extension
+extension View {
+    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
+        clipShape( RoundedCorner(radius: radius, corners: corners) )
+    }
+}
+
+struct RoundedCorner: Shape {
+    var radius: CGFloat = 16
+    var corners: UIRectCorner = [.allCorners]
+    
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(path.cgPath)
     }
 }
 
@@ -277,7 +388,8 @@ struct MovieGridCell: View {
     var body: some View {
         NavigationLink(destination: AddMovieToCartView(movie: movie)) {
             
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 6) {
+                // Poster
                 if let url = imageURL {
                     AsyncImage(url: url) { phase in
                         switch phase {
@@ -307,14 +419,50 @@ struct MovieGridCell: View {
                         .cornerRadius(8)
                 }
                 
+                // 1. satır → Film adı
                 Text(movie.name ?? "İsimsiz")
                     .font(.headline)
+                    .foregroundColor(.white)
                     .lineLimit(1)
                 
+                // 2. satır → Kategori
+                if let category = movie.category {
+                    Text(category)
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                        .lineLimit(1)
+                }
+                
+                // 3. satır → Yıl
                 Text("\(movie.year ?? 0)")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
+                
+                // 4. satır → Rating + Price
+                HStack(spacing: 8) {
+                    if let rating = movie.rating {
+                        HStack(spacing: 2) {
+                            Image(systemName: "star.fill")
+                                .foregroundColor(.yellow)
+                                .font(.subheadline)
+                            Text(String(format: "%.1f", rating))
+                                .foregroundColor(.white)
+                                .font(.subheadline)
+                        }
+                    }
+                    
+                    if let price = movie.price {
+                        Text("$\(price)")
+                            .bold()
+                            .foregroundColor(AppColors.accent)
+                            .font(.subheadline)
+                    }
+                }
             }
+            .padding()
+            .background(AppColors.cardBackground)
+            .cornerRadius(16)
+            .shadow(color: .black.opacity(0.6), radius: 8, x: 0, y: 4)
         }
     }
 }

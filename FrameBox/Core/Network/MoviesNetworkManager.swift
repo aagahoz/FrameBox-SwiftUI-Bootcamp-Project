@@ -10,6 +10,8 @@ import Foundation
 // MARK: - MoviesNetworkManager
 final class MoviesNetworkManager {
     
+    static let shared = MoviesNetworkManager()
+    
     // MARK: - Properties
     private let baseURL = "http://kasimadalan.pe.hu/movies/"
     private let fixedUserName = "agah_ozdemir"
@@ -43,6 +45,7 @@ final class MoviesNetworkManager {
     // MARK: - Public Methods
     /// Tüm filmleri çeker
     func fetchMovies(completion: @escaping (Result<[MovieModel], Error>) -> Void) {
+        print("test")
         guard let url = URL(string: baseURL + Endpoint.allMovies.rawValue) else {
             completion(.failure(NetworkError.invalidURL))
             return
@@ -62,6 +65,7 @@ final class MoviesNetworkManager {
             do {
                 let decoder = JSONDecoder()
                 let response = try decoder.decode(MoviesResponseModel.self, from: data)
+                print(response.movies[0].year ?? 0)
                 completion(.success(response.movies))
             } catch {
                 print("Decoding error:", error)
@@ -212,3 +216,4 @@ final class MoviesNetworkManager {
         task.resume()
     }
 }
+

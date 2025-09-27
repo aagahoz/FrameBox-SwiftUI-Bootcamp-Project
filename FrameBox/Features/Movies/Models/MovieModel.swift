@@ -51,3 +51,19 @@ struct CartMoviesResponseModel: Codable {
         case movies = "movie_cart"
     }
 }
+
+extension CartMovieModel {
+    func toMovieModel() -> MovieModel {
+        MovieModel(
+            id: cartId,
+            name: name,
+            image: image,
+            price: price,
+            category: category,
+            rating: rating,
+            year: year,
+            director: director,
+            description: description
+        )
+    }
+}
